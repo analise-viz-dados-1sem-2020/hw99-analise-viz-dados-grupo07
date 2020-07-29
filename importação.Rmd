@@ -4,9 +4,9 @@ author: "Grupo 7"
 date: "19/07/2020"
 output: github_document
 ---
-### Introdução
+## Introdução
 
-## A base de dados escolhida para a realização da análise exploratória referente ao Trabaho final dessa discplina foi sobre os Repasses a municípios e pode ser acessada nessa [página](http://www.transparencia.dadosabertos.mg.gov.br/dataset/repasse-a-municipios-2015-2016)
+##### A base de dados escolhida para a realização da análise exploratória referente ao Trabaho final dessa discplina foi sobre os Repasses a municípios e pode ser acessada nessa [página](http://www.transparencia.dadosabertos.mg.gov.br/dataset/repasse-a-municipios-2015-2016)
 
 Essa base de dado possui as seguintes informações: dados sobre repasse do Estado aos municípios em relação aos tributos ICMS, IPI e IPVA. Trata-se do repasse líquido, a que cada município tem direito descontando-se outras contribuições legais e constitucionais de cada um. Retrata o repasse publicado em portarias mensais da Secretaria de Estado da Fazenda.
 
@@ -25,146 +25,238 @@ Na primeira fase do trabaçho final deve ser feita a importação da base que se
 9. Quanto foi o repasse total de ICMS em cada **mês de 2016**?
 10. Quanto foi o repasse total de IPI em cada **mês de 2016**?
 11. Quanto foi o repasse total de IPVA em cada **mês de 2016**?
+
+## Análise dos dados
+
 ```{r, setup, include=FALSE}
-library(readr); library(readxl); library(ggplot2); library(tidyverse); library(magrittr); library(data.table)
+library(readr); library(readxl); library(ggplot2); library(tidyverse); library(magrittr); library(readr); library(readxl); library(ggplot2)
+```
 
+```{r, include=FALSE}
 
-rm_accent <- function(str,pattern="all") {
-  if(!is.character(str))
-    str <- as.character(str)
-  pattern <- unique(pattern)
-  if(any(pattern=="Ç"))
-    pattern[pattern=="Ç"] <- "ç"
-  symbols <- c(
-    acute = "áéíóúÁÉÍÓÚýÝ",
-    grave = "àèìòùÀÈÌÒÙ",
-    circunflex = "âêîôûÂÊÎÔÛ",
-    tilde = "ãõÃÕñÑ",
-    umlaut = "äëïöüÄËÏÖÜÿ",
-    cedil = "çÇ"
-  )
-  nudeSymbols <- c(
-    acute = "aeiouAEIOUyY",
-    grave = "aeiouAEIOU",
-    circunflex = "aeiouAEIOU",
-    tilde = "aoAOnN",
-    umlaut = "aeiouAEIOUy",
-    cedil = "cC"
-  )
-  accentTypes <- c("´","`","^","~","¨","ç")
-  if(any(c("all","al","a","todos","t","to","tod","todo")%in%pattern)) # opcao retirar todos
-    return(chartr(paste(symbols, collapse=""), paste(nudeSymbols, collapse=""), str))
-  for(i in which(accentTypes%in%pattern))
-    str <- chartr(symbols[i],nudeSymbols[i], str)
-  return(str)
-}
+base <- read.csv("data-raw/ftrepassemun2016.csv", sep = ";", dec = ",")
 
-base <- read_excel("data-raw/ftrepassemun2016.xlsx")
+base_tempo_mensal <- read.csv("data-raw/dmtempomensal2016.csv", sep = ";", dec = ",")
 
-base_mes <- read_excel("data-raw/dmtempomensal2016.xlsx")
-
-base_municipio <- read_excel("data-raw/dmmunicipio2016.xlsx")
-
-municipio_sem_acento <- rm_accent(base_municipio$NOME)
-
-base_municipio[3] <- municipio_sem_acento
-
+base_municipio <- read.csv("data-raw/dmmunicipio2016.csv", sep = ";", dec = ",", encoding = "latin1")
 
 ```
-```{r}
-library(readr); library(readxl); library(ggplot2); library(tidyverse)
 
-base <- readxl::read_xlsx("data-raw/ftrepassemun2016.xlsx")
+```{r, echo=FALSE}
 
-base_tempo_mensal <- readxl::read_xlsx("data-raw/dmtempomensal2016.xlsx")
+x <- stringi::stri_trans_general(base_municipio$NOME, "latin-ascii")
 
-base_municipio <- readxl::read_xlsx("data-raw/dmmunicipio2016.xlsx")
+base_municipio <- base_municipio %>% mutate(NOME_MUNICIPIO = x) %>% 
+  select(-NOME)
+
+```
+
+
+```{r, echo=FALSE}
+base_tempo_mensal <- base_tempo_mensal %>% 
+  mutate(ANOMES_FORMATADO = case_when(ANOMES_FORMATADO == "01/2016" ~ "Jan",
+ ANOMES_FORMATADO == "02/2016"  ~ "Fev",
+ ANOMES_FORMATADO == "03/2016" ~ "Mar",
+ ANOMES_FORMATADO == "04/2016" ~ "Abr",
+ ANOMES_FORMATADO == "05/2016" ~ "Mai",
+ ANOMES_FORMATADO == "06/2016" ~ "Jun",
+ ANOMES_FORMATADO == "07/2016" ~ "Jul",
+ ANOMES_FORMATADO == "08/2016" ~ "Ago",
+ ANOMES_FORMATADO == "09/2016" ~ "Set",
+ ANOMES_FORMATADO == "10/2016" ~ "Out",
+ ANOMES_FORMATADO == "11/2016" ~ "Nov",
+ ANOMES_FORMATADO == "12/2016" ~ "Dez")) %>%
+  rename(NOME_MES = "ANOMES_FORMATADO")
+```
+
+1. Quais são os 10 municípios que recebem a maior porcentagem de repasses do **ICMS**?
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
 
 ID <- left_join(base_municipio, base, by = "ID_MUNICIPIO")
 
 ID %>%
-  group_by(NOME) %>%
+  group_by(NOME_MUNICIPIO) %>%
   summarize(TOTAL_ICMS = sum(VR_ICMS)) %>%
   mutate(PORCENTAGEM_ICMS = (TOTAL_ICMS/sum(TOTAL_ICMS)*100)) %>%
   arrange(desc(PORCENTAGEM_ICMS)) %>%
   filter(PORCENTAGEM_ICMS >= 1.39) %>%
   ggplot()+
-  geom_col(aes(x = NOME, y = PORCENTAGEM_ICMS)) +
+  geom_col(aes(x = NOME_MUNICIPIO, y = PORCENTAGEM_ICMS)) +
   labs(title = "10 municípios que recebem a maior porcentagem de ICMS") +
   xlab("Município") + ylab("Porcentagem ICMS")
 ```
 
 2. Quais são os 10 municípios que recebem a maior porcentagem de repasses do **IPI**?
 
-```{r}
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
 ID %>%
-  group_by(NOME) %>%
+  group_by(NOME_MUNICIPIO) %>%
   summarize(TOTAL_IPI = sum(VR_IPI)) %>%
   mutate(PORCENTAGEM_IPI = (TOTAL_IPI/sum(TOTAL_IPI))*100) %>%
   arrange(desc(PORCENTAGEM_IPI)) %>%
   filter(PORCENTAGEM_IPI >= 1.39) %>%
   ggplot()+
-  geom_col(aes(x = NOME, y = PORCENTAGEM_IPI)) +
+  geom_col(aes(x = NOME_MUNICIPIO, y = PORCENTAGEM_IPI)) +
   labs(title = "10 municípios que recebem a maior porcentagem de IPI") +
   xlab("Município") + ylab("Porcentagem IPI")
 ```
 
 3. Quais são os 10 municípios que recebem a maior porcentagem de repasses do **IPVA**?
-```{r}
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
 ID %>%
-  group_by(NOME) %>%
+  group_by(NOME_MUNICIPIO) %>%
   summarize(TOTAL_IPVA = sum(VR_IPVA)) %>%
   mutate(PORCENTAGEM_IPVA = (TOTAL_IPVA/sum(TOTAL_IPVA)*100)) %>%
   arrange(desc(PORCENTAGEM_IPVA)) %>%
   filter(PORCENTAGEM_IPVA >= 1.25) %>%
   ggplot()+
-  geom_col(aes(x = NOME, y = PORCENTAGEM_IPVA)) +
+  geom_col(aes(x = NOME_MUNICIPIO, y = PORCENTAGEM_IPVA)) +
   labs(title = "10 municípios que recebem a maior porcentagem de IPVA") +
   xlab("Município") + ylab("Porcentagem IPVA")   
 ```
 
 4. Quais são os valores absolutos referentes aos 10 maiores repasses de **ICMS** e quais são elas?
 
-```{r}
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
 ID %>%
-  group_by(NOME) %>%
+  group_by(NOME_MUNICIPIO) %>%
   summarize(TOTAL_ICMS = sum(VR_ICMS)) %>%
   mutate(ABSOLUTO_ICMS = TOTAL_ICMS/1000000) %>%
   arrange(desc(ABSOLUTO_ICMS)) %>%
   filter(ABSOLUTO_ICMS >= 144) %>%
   ggplot()+
-  geom_col(aes(x = NOME, y = ABSOLUTO_ICMS)) +
+  geom_col(aes(x = NOME_MUNICIPIO, y = ABSOLUTO_ICMS)) +
   labs(title = "10 municípios que recebem os maiores valores absolutos de ICMS") +
   xlab("Município") + ylab("ICMS (Milhões)")
 ```
 
 5. Quais são os valores absolutos referentes aos 10 maiores repasses de **IPI** e quais são elas?
 
-```{r}
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
 ID %>%
-  group_by(NOME) %>%
+  group_by(NOME_MUNICIPIO) %>%
   summarize(TOTAL_IPI = sum(VR_IPI)) %>%
   mutate(ABSOLUTO_IPI = TOTAL_IPI/1000000) %>%
   arrange(desc(ABSOLUTO_IPI)) %>%
   filter(ABSOLUTO_IPI >= 1.78) %>%
   ggplot()+
-  geom_col(aes(x = NOME, y = ABSOLUTO_IPI)) +
+  geom_col(aes(x = NOME_MUNICIPIO, y = ABSOLUTO_IPI)) +
   labs(title = "10 municípios que recebem os maiores valores absolutos de IPI") +
   xlab("Município") + ylab("IPI (Milhões)")
 ```
 
 6. Quais são os valores absolutos referentes aos 10 maiores repasses de **IPVA** e quais são elas?
 
-```{r}
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
 ID %>%
-  group_by(NOME) %>%
+  group_by(NOME_MUNICIPIO) %>%
   summarize(TOTAL_IPVA = sum(VR_IPVA)) %>%
   mutate(ABSOLUTO_IPVA = TOTAL_IPVA/1000000) %>%
   arrange(desc(ABSOLUTO_IPVA)) %>%
   filter(ABSOLUTO_IPVA >= 30.0) %>%
   ggplot()+
-  geom_col(aes(x = NOME, y = ABSOLUTO_IPVA)) +
+  geom_col(aes(x = NOME_MUNICIPIO, y = ABSOLUTO_IPVA)) +
   labs(title = "10 municípios que recebem os maiores valores absolutos de IPVA") +
   xlab("Município") + ylab("IPVA (Milhões)")
 ```
 
+7. Quais são os 5 municípios que recebem o **maior** repasse total (ICMS+IPI+IPVA)?
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+ID_MAIOR <- ID %>%
+  group_by(NOME_MUNICIPIO) %>%
+  summarize(TOTAL_ICMS = sum(VR_ICMS), TOTAL_IPI = sum(VR_IPI), 
+            TOTAL_IPVA = sum(VR_IPVA)) 
+
+  mutate(ID_MAIOR, REPASSE_TOTAL = (apply(ID_MAIOR[, 2:4], 1, sum))/1000000) %>%
+  arrange(desc(REPASSE_TOTAL)) %>%
+  filter(REPASSE_TOTAL >= 266.973532) %>%
+  ggplot() +
+  geom_col(aes(x = NOME_MUNICIPIO, y = REPASSE_TOTAL)) + 
+  labs(title = "5 municípios que rebebem o maior valor de repasse total dos impostos (em milhões)") + xlab("Município") + ylab("Repasse total dos impostos")
+
+
+```
+
+8. Quais são os 5 municípios que recebem o **menor** repasse total (ICMS+IPI+IPVA)?
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+  mutate(ID_MAIOR, REPASSE_TOTAL = (apply(ID_MAIOR[, 2:4], 1, sum))/1000000) %>%
+  arrange(REPASSE_TOTAL) %>%
+  filter(REPASSE_TOTAL <= 1.470765) %>%
+  ggplot() +
+  geom_col(aes(x = NOME_MUNICIPIO, y = REPASSE_TOTAL)) + 
+  labs(title = "5 municípios que rebebem o maior valor de repasse total dos impostos (em milhões)") + xlab("Município") + ylab("Repasse total dos impostos")
+```
+
+9. Quanto foi o repasse total de ICMS em cada **mês de 2016**?
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+base_tempo_mensal2 <- base_tempo_mensal %>% select(ID_TEMPO, NOME_MES)
+
+meses <- c("Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez")
+
+ID2 <- left_join(ID, base_tempo_mensal2, by = "ID_TEMPO")
+ID2 %>% select(NOME_MES, VR_ICMS) %>%
+  group_by(NOME_MES) %>%
+  summarize(ICMS_MES = sum(VR_ICMS)/1000000) %>%
+  mutate(NOME_MES = factor(NOME_MES, levels = meses)) %>%
+  arrange(NOME_MES) %>%
+  ggplot()+
+  geom_col(aes(x = NOME_MES, y = ICMS_MES)) +
+  labs(title = "Repasse ICMS em cada mês (em milhões)") +
+  xlab("Mês") + ylab("Repasse ICMS")
+  
+```
+
+
+10. Quanto foi o repasse total de IPI em cada **mês de 2016**?
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+ID2 %>% select(NOME_MES, VR_IPI) %>%
+  group_by(NOME_MES) %>%
+  summarize(IPI_MES = sum(VR_IPI)/1000000) %>%
+  mutate(NOME_MES = factor(NOME_MES, levels = meses)) %>%
+  arrange(NOME_MES) %>%
+  ggplot()+
+  geom_col(aes(x = NOME_MES, y = IPI_MES)) +
+  labs(title = "Repasse IPI em cada mês (em milhões)") +
+  xlab("Mês") + ylab("Repasse IPI")
+
+```
+
+
+11. Quanto foi o repasse total de IPVA em cada **mês de 2016**?
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+ID2 %>% select(NOME_MES, VR_IPVA) %>%
+  group_by(NOME_MES) %>%
+  summarize(IPVA_MES = sum(VR_IPVA)/1000000) %>%
+  mutate(NOME_MES = factor(NOME_MES, levels = meses)) %>%
+  arrange(NOME_MES) %>%
+  ggplot()+
+  geom_col(aes(x = NOME_MES, y = IPVA_MES)) +
+  labs(title = "Repasse IPVA em cada mês (em milhões)") +
+  xlab("Mês") + ylab("Repasse IPVA")
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+ID2 %>% select(NOME_MES, VR_ICMS, VR_IPI, VR_IPVA)
+
+ID_ICMS <- ID2 %>% select(NOME_MES, VR_ICMS) %>% mutate(IMPOSTO = "ICMS") %>% rename(VALOR = "VR_ICMS")
+ID_IPI <- ID2 %>% select(NOME_MES, VR_IPI) %>% mutate(IMPOSTO = "IPI") %>% rename(VALOR = "VR_IPI")
+ID_IPVA <- ID2 %>% select(NOME_MES, VR_IPVA)  %>% mutate(IMPOSTO = "IPVA") %>% rename(VALOR = "VR_IPVA")
+
+bind_rows(ID_ICMS, ID_IPI, ID_IPVA) %>%
+  group_by(NOME_MES, IMPOSTO) %>%
+  summarize(VALOR_IMPOSTO = sum((VALOR)/1000000)) %>%
+  mutate(NOME_MES = factor(NOME_MES, levels = meses)) %>%
+  arrange(NOME_MES) %>%
+  ggplot()+
+  geom_col(aes(x = NOME_MES, y = VALOR_IMPOSTO, color = IMPOSTO)) +
+  labs(title = "Repasse dos impostos em cada mês (em milhões)") +
+  xlab("Mês") + ylab("Valor de repasse")
+
+```

@@ -70,7 +70,56 @@ municipio_sem_acento <- rm_accent(base_municipio$NOME)
 base_municipio[3] <- municipio_sem_acento
 
 
+```
+```{r}
+library(readr); library(readxl); library(ggplot2); library(tidyverse)
 
+base <- readxl::read_xlsx("data-raw/ftrepassemun2016.xlsx")
+
+base_tempo_mensal <- readxl::read_xlsx("data-raw/dmtempomensal2016.xlsx")
+
+base_municipio <- readxl::read_xlsx("data-raw/dmmunicipio2016.xlsx")
+
+ID <- left_join(base_municipio, base, by = "ID_MUNICIPIO")
+
+ID %>%
+  group_by(NOME) %>%
+  summarize(TOTAL_ICMS = sum(VR_ICMS)) %>%
+  mutate(PORCENTAGEM_ICMS = TOTAL_ICMS/sum(TOTAL_ICMS)) %>%
+  arrange(desc(PORCENTAGEM_ICMS)) %>%
+  filter(PORCENTAGEM_ICMS >= 0.0139) %>%
+  ggplot()+
+  geom_col(aes(x = NOME, y = PORCENTAGEM_ICMS)) +
+  labs(title = "10 municípios que recebem a maior porcentagem de ICMS") +
+  xlab("Município") + ylab("Porcentagem ICMS")
 ```
 
+2. Quais são os 10 municípios que recebem a maior porcentagem de repasses do **IPI**?
+
+```{r}
+ID %>%
+  group_by(NOME) %>%
+  summarize(TOTAL_IPI = sum(VR_IPI)) %>%
+  mutate(PORCENTAGEM_IPI = TOTAL_IPI/sum(TOTAL_IPI)) %>%
+  arrange(desc(PORCENTAGEM_IPI)) %>%
+  filter(PORCENTAGEM_IPI >= 0.0139) %>%
+  ggplot()+
+  geom_col(aes(x = NOME, y = PORCENTAGEM_IPI)) +
+  labs(title = "10 municípios que recebem a maior porcentagem de IPI") +
+  xlab("Município") + ylab("Porcentagem IPI")
+```
+
+3. Quais são os 10 municípios que recebem a maior porcentagem de repasses do **IPVA**?
+```{r}
+ID %>%
+  group_by(NOME) %>%
+  summarize(TOTAL_IPVA = sum(VR_IPVA)) %>%
+  mutate(PORCENTAGEM_IPVA = TOTAL_IPVA/sum(TOTAL_IPVA)) %>%
+  arrange(desc(PORCENTAGEM_IPVA)) %>%
+  filter(PORCENTAGEM_IPVA >= 0.0125) %>%
+  ggplot()+
+  geom_col(aes(x = NOME, y = PORCENTAGEM_IPVA)) +
+  labs(title = "10 municípios que recebem a maior porcentagem de IPVA") +
+  xlab("Município") + ylab("Porcentagem IPVA")   
+```
 

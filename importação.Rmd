@@ -85,9 +85,9 @@ ID <- left_join(base_municipio, base, by = "ID_MUNICIPIO")
 ID %>%
   group_by(NOME) %>%
   summarize(TOTAL_ICMS = sum(VR_ICMS)) %>%
-  mutate(PORCENTAGEM_ICMS = TOTAL_ICMS/sum(TOTAL_ICMS)) %>%
+  mutate(PORCENTAGEM_ICMS = (TOTAL_ICMS/sum(TOTAL_ICMS)*100)) %>%
   arrange(desc(PORCENTAGEM_ICMS)) %>%
-  filter(PORCENTAGEM_ICMS >= 0.0139) %>%
+  filter(PORCENTAGEM_ICMS >= 1.39) %>%
   ggplot()+
   geom_col(aes(x = NOME, y = PORCENTAGEM_ICMS)) +
   labs(title = "10 municípios que recebem a maior porcentagem de ICMS") +
@@ -100,9 +100,9 @@ ID %>%
 ID %>%
   group_by(NOME) %>%
   summarize(TOTAL_IPI = sum(VR_IPI)) %>%
-  mutate(PORCENTAGEM_IPI = TOTAL_IPI/sum(TOTAL_IPI)) %>%
+  mutate(PORCENTAGEM_IPI = (TOTAL_IPI/sum(TOTAL_IPI))*100) %>%
   arrange(desc(PORCENTAGEM_IPI)) %>%
-  filter(PORCENTAGEM_IPI >= 0.0139) %>%
+  filter(PORCENTAGEM_IPI >= 1.39) %>%
   ggplot()+
   geom_col(aes(x = NOME, y = PORCENTAGEM_IPI)) +
   labs(title = "10 municípios que recebem a maior porcentagem de IPI") +
@@ -114,12 +114,57 @@ ID %>%
 ID %>%
   group_by(NOME) %>%
   summarize(TOTAL_IPVA = sum(VR_IPVA)) %>%
-  mutate(PORCENTAGEM_IPVA = TOTAL_IPVA/sum(TOTAL_IPVA)) %>%
+  mutate(PORCENTAGEM_IPVA = (TOTAL_IPVA/sum(TOTAL_IPVA)*100)) %>%
   arrange(desc(PORCENTAGEM_IPVA)) %>%
-  filter(PORCENTAGEM_IPVA >= 0.0125) %>%
+  filter(PORCENTAGEM_IPVA >= 1.25) %>%
   ggplot()+
   geom_col(aes(x = NOME, y = PORCENTAGEM_IPVA)) +
   labs(title = "10 municípios que recebem a maior porcentagem de IPVA") +
   xlab("Município") + ylab("Porcentagem IPVA")   
+```
+
+4. Quais são os valores absolutos referentes aos 10 maiores repasses de **ICMS** e quais são elas?
+
+```{r}
+ID %>%
+  group_by(NOME) %>%
+  summarize(TOTAL_ICMS = sum(VR_ICMS)) %>%
+  mutate(ABSOLUTO_ICMS = TOTAL_ICMS/1000000) %>%
+  arrange(desc(ABSOLUTO_ICMS)) %>%
+  filter(ABSOLUTO_ICMS >= 144) %>%
+  ggplot()+
+  geom_col(aes(x = NOME, y = ABSOLUTO_ICMS)) +
+  labs(title = "10 municípios que recebem os maiores valores absolutos de ICMS") +
+  xlab("Município") + ylab("ICMS (Milhões)")
+```
+
+5. Quais são os valores absolutos referentes aos 10 maiores repasses de **IPI** e quais são elas?
+
+```{r}
+ID %>%
+  group_by(NOME) %>%
+  summarize(TOTAL_IPI = sum(VR_IPI)) %>%
+  mutate(ABSOLUTO_IPI = TOTAL_IPI/1000000) %>%
+  arrange(desc(ABSOLUTO_IPI)) %>%
+  filter(ABSOLUTO_IPI >= 1.78) %>%
+  ggplot()+
+  geom_col(aes(x = NOME, y = ABSOLUTO_IPI)) +
+  labs(title = "10 municípios que recebem os maiores valores absolutos de IPI") +
+  xlab("Município") + ylab("IPI (Milhões)")
+```
+
+6. Quais são os valores absolutos referentes aos 10 maiores repasses de **IPVA** e quais são elas?
+
+```{r}
+ID %>%
+  group_by(NOME) %>%
+  summarize(TOTAL_IPVA = sum(VR_IPVA)) %>%
+  mutate(ABSOLUTO_IPVA = TOTAL_IPVA/1000000) %>%
+  arrange(desc(ABSOLUTO_IPVA)) %>%
+  filter(ABSOLUTO_IPVA >= 30.0) %>%
+  ggplot()+
+  geom_col(aes(x = NOME, y = ABSOLUTO_IPVA)) +
+  labs(title = "10 municípios que recebem os maiores valores absolutos de IPVA") +
+  xlab("Município") + ylab("IPVA (Milhões)")
 ```
 

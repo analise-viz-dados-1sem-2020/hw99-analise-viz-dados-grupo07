@@ -6,11 +6,11 @@ output: github_document
 ---
 ## Introdução
 
-##### A base de dados escolhida para a realização da análise exploratória referente ao Trabaho final dessa discplina foi sobre os Repasses a municípios e pode ser acessada nessa [página](http://www.transparencia.dadosabertos.mg.gov.br/dataset/repasse-a-municipios-2015-2016)
+##### A base de dados escolhida para a realização da análise exploratória referente ao Trabalho Final dessa discplina foi sobre os Repasses a municípios e pode ser acessada nessa [página](http://www.transparencia.dadosabertos.mg.gov.br/dataset/repasse-a-municipios-2015-2016)
 
-Essa base de dado possui as seguintes informações: dados sobre repasse do Estado aos municípios em relação aos tributos ICMS, IPI e IPVA. Trata-se do repasse líquido, a que cada município tem direito descontando-se outras contribuições legais e constitucionais de cada um. Retrata o repasse publicado em portarias mensais da Secretaria de Estado da Fazenda.
+Essa base de dados possui as seguintes informações: dados sobre repasse do Estado aos municípios em relação aos tributos ICMS, IPI e IPVA. Trata-se do repasse líquido, a que cada município tem direito descontando-se outras contribuições legais e constitucionais de cada um. Retrata o repasse publicado em portarias mensais da Secretaria de Estado da Fazenda.
 
-Na primeira fase do trabaçho final deve ser feita a importação da base que será utilziada e as perguntas que nortearão a análise exporatória.
+Na primeira fase do trabalho final deve ser feita a importação da base que será utilizada e as perguntas que nortearão a análise exploratória.
 
 ### Perguntas
 
@@ -81,8 +81,8 @@ ID %>%
   mutate(PORCENTAGEM_ICMS = (TOTAL_ICMS/sum(TOTAL_ICMS)*100)) %>%
   arrange(desc(PORCENTAGEM_ICMS)) %>%
   filter(PORCENTAGEM_ICMS >= 1.39) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = PORCENTAGEM_ICMS)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -PORCENTAGEM_ICMS, sum), y = PORCENTAGEM_ICMS))+
+  geom_col() +
   labs(title = "10 municípios que recebem a maior porcentagem de ICMS") +
   xlab("Município") + ylab("Porcentagem ICMS")
 ```
@@ -96,8 +96,8 @@ ID %>%
   mutate(PORCENTAGEM_IPI = (TOTAL_IPI/sum(TOTAL_IPI))*100) %>%
   arrange(desc(PORCENTAGEM_IPI)) %>%
   filter(PORCENTAGEM_IPI >= 1.39) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = PORCENTAGEM_IPI)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -PORCENTAGEM_IPI, sum), y = PORCENTAGEM_IPI))+
+  geom_col() +
   labs(title = "10 municípios que recebem a maior porcentagem de IPI") +
   xlab("Município") + ylab("Porcentagem IPI")
 ```
@@ -110,8 +110,8 @@ ID %>%
   mutate(PORCENTAGEM_IPVA = (TOTAL_IPVA/sum(TOTAL_IPVA)*100)) %>%
   arrange(desc(PORCENTAGEM_IPVA)) %>%
   filter(PORCENTAGEM_IPVA >= 1.25) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = PORCENTAGEM_IPVA)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -PORCENTAGEM_IPVA, sum), y = PORCENTAGEM_IPVA))+
+  geom_col() +
   labs(title = "10 municípios que recebem a maior porcentagem de IPVA") +
   xlab("Município") + ylab("Porcentagem IPVA")   
 ```
@@ -122,11 +122,20 @@ ID %>%
 ID %>%
   group_by(NOME_MUNICIPIO) %>%
   summarize(TOTAL_ICMS = sum(VR_ICMS)) %>%
+  mutate(ICMS_MILHOES = TOTAL_ICMS/1000000) %>%
+  arrange(desc(ICMS_MILHOES)) %>%
+  filter(ICMS_MILHOES >= 144)
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+ID %>%
+  group_by(NOME_MUNICIPIO) %>%
+  summarize(TOTAL_ICMS = sum(VR_ICMS)) %>%
   mutate(ABSOLUTO_ICMS = TOTAL_ICMS/1000000) %>%
   arrange(desc(ABSOLUTO_ICMS)) %>%
   filter(ABSOLUTO_ICMS >= 144) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = ABSOLUTO_ICMS)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -ABSOLUTO_ICMS, sum), y = ABSOLUTO_ICMS))+
+  geom_col() +
   labs(title = "10 municípios que recebem os maiores valores absolutos de ICMS") +
   xlab("Município") + ylab("ICMS (Milhões)")
 ```
@@ -137,11 +146,20 @@ ID %>%
 ID %>%
   group_by(NOME_MUNICIPIO) %>%
   summarize(TOTAL_IPI = sum(VR_IPI)) %>%
+  mutate(IPI_MILHOES = TOTAL_IPI/1000000) %>%
+  arrange(desc(IPI_MILHOES)) %>%
+  filter(IPI_MILHOES >= 1.78)
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+ID %>%
+  group_by(NOME_MUNICIPIO) %>%
+  summarize(TOTAL_IPI = sum(VR_IPI)) %>%
   mutate(ABSOLUTO_IPI = TOTAL_IPI/1000000) %>%
   arrange(desc(ABSOLUTO_IPI)) %>%
   filter(ABSOLUTO_IPI >= 1.78) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = ABSOLUTO_IPI)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -ABSOLUTO_IPI, sum), y = ABSOLUTO_IPI))+
+  geom_col() +
   labs(title = "10 municípios que recebem os maiores valores absolutos de IPI") +
   xlab("Município") + ylab("IPI (Milhões)")
 ```
@@ -152,11 +170,20 @@ ID %>%
 ID %>%
   group_by(NOME_MUNICIPIO) %>%
   summarize(TOTAL_IPVA = sum(VR_IPVA)) %>%
+  mutate(IPVA_MILHOES = TOTAL_IPVA/1000000) %>%
+  arrange(desc(IPVA_MILHOES)) %>%
+  filter(IPVA_MILHOES >= 30.0)
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+ID %>%
+  group_by(NOME_MUNICIPIO) %>%
+  summarize(TOTAL_IPVA = sum(VR_IPVA)) %>%
   mutate(ABSOLUTO_IPVA = TOTAL_IPVA/1000000) %>%
   arrange(desc(ABSOLUTO_IPVA)) %>%
   filter(ABSOLUTO_IPVA >= 30.0) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = ABSOLUTO_IPVA)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -ABSOLUTO_IPVA, sum), y = ABSOLUTO_IPVA))+
+  geom_col() +
   labs(title = "10 municípios que recebem os maiores valores absolutos de IPVA") +
   xlab("Município") + ylab("IPVA (Milhões)")
 ```

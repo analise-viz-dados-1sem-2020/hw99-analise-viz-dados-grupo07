@@ -243,7 +243,6 @@ ID2 %>% select(NOME_MES, VR_IPVA) %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 
-ID2 %>% select(NOME_MES, VR_ICMS, VR_IPI, VR_IPVA)
 
 ID_ICMS <- ID2 %>% select(NOME_MES, VR_ICMS) %>% mutate(IMPOSTO = "ICMS") %>% rename(VALOR = "VR_ICMS")
 ID_IPI <- ID2 %>% select(NOME_MES, VR_IPI) %>% mutate(IMPOSTO = "IPI") %>% rename(VALOR = "VR_IPI")

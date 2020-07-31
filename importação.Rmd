@@ -304,3 +304,7 @@ bind_rows(ID_ICMS, ID_IPI, ID_IPVA) %>%
   xlab("Mês") + ylab("Valor de repasse")
 
 ```
+
+## Limitações e dificuldades operacionais
+
+Devido à modificação do Portal do Dados Abertos de Minas Gerais simultaneamente à elaboração dessa Análise Exploratória, observou-se como dificuldades operacionais o acompanhamento das mudanças de bases realizadas pelo portal. Nesse sentido, no início da análise, as bases foram retiradas e importadas corretamente do link antigo referente à seção de Dados Abertos do Portal da Transparência, que foi sucedida por outra, intitulada Novo Portal de Dados Abertos. Entretanto, este, ainda em fase de construção, ainda não possui, igualmente, todos os conjuntos e organizações antes pertencentes ao primeiro portal. Dessa forma, necessitou-se realizar alterações no Relatório inicial da Pesquisa Exploratória.

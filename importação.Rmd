@@ -6,11 +6,11 @@ output: github_document
 ---
 ## Introdução
 
-##### A base de dados escolhida para a realização da análise exploratória referente ao Trabaho final dessa discplina foi sobre os Repasses a municípios e pode ser acessada nessa [página](http://www.transparencia.dadosabertos.mg.gov.br/dataset/repasse-a-municipios-2015-2016)
+##### A base de dados escolhida para a realização da análise exploratória referente ao Trabalho Final dessa discplina foi sobre os Repasses a municípios e pode ser acessada nessa [página](http://www.transparencia.dadosabertos.mg.gov.br/dataset/repasse-a-municipios-2015-2016). No início dessa Análise exploratória utilizou-se a página retratada anteriormente. Todavia, a mesma foi substituída, recentemente, por [esta nova página](http://www.dados.mg.gov.br/) ainda em construção.
 
-Essa base de dado possui as seguintes informações: dados sobre repasse do Estado aos municípios em relação aos tributos ICMS, IPI e IPVA. Trata-se do repasse líquido, a que cada município tem direito descontando-se outras contribuições legais e constitucionais de cada um. Retrata o repasse publicado em portarias mensais da Secretaria de Estado da Fazenda.
+Essa base de dados possui as seguintes informações: dados sobre repasse do Estado aos municípios em relação aos tributos ICMS, IPI e IPVA. Trata-se do repasse líquido, a que cada município tem direito descontando-se outras contribuições legais e constitucionais de cada um. Retrata o repasse publicado em portarias mensais da Secretaria de Estado da Fazenda.
 
-Na primeira fase do trabaçho final deve ser feita a importação da base que será utilziada e as perguntas que nortearão a análise exporatória.
+Na primeira fase do trabalho final deve ser feita a importação da base que será utilizada e as perguntas que nortearão a análise exploratória.
 
 ### Perguntas
 
@@ -26,7 +26,7 @@ Na primeira fase do trabaçho final deve ser feita a importação da base que se
 10. Quanto foi o repasse total de IPI em cada **mês de 2016**?
 11. Quanto foi o repasse total de IPVA em cada **mês de 2016**?
 
-## Análise dos dados
+## Análise exploratória 
 
 ```{r, setup, include=FALSE}
 library(readr); library(readxl); library(ggplot2); library(tidyverse); library(magrittr); library(readr); library(readxl); library(ggplot2)
@@ -81,11 +81,16 @@ ID %>%
   mutate(PORCENTAGEM_ICMS = (TOTAL_ICMS/sum(TOTAL_ICMS)*100)) %>%
   arrange(desc(PORCENTAGEM_ICMS)) %>%
   filter(PORCENTAGEM_ICMS >= 1.39) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = PORCENTAGEM_ICMS)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -PORCENTAGEM_ICMS, sum), y = PORCENTAGEM_ICMS))+
+  geom_col() +
   labs(title = "10 municípios que recebem a maior porcentagem de ICMS") +
   xlab("Município") + ylab("Porcentagem ICMS")
+
 ```
+
+### Análise gráfico 1
+
+No **gráfico 1**, em que se busca demonstrar quais são os **10 municípios que recebem a maior porcentagem de repasses do ICMS**, percebe-se uma significativa concentração dos maiores repasses a municípios que se encontram na **região metropolitana de Belo Horizonte** ou, ainda, são considerados **polos comerciais** ou **cidades com um volume populacional elevado**. Observa-se na ordem de maiores repasses Belo Horizonte, Betim, Uberlândia, Juiz de Fora e Contagem, tendo estes, respectivamente, porcentagens dos repasses totais entre, aproximadamente, **8,0% e 4,0%.** Isso, ao se considerar a quantidade total de 853 municípios retrata, por sua vez, o caráter de concentração de tais repasses a municípios de grande porte que possuem entre 600 mil e 2,5 milhões de habitantes.
 
 2. Quais são os 10 municípios que recebem a maior porcentagem de repasses do **IPI**?
 
@@ -96,8 +101,8 @@ ID %>%
   mutate(PORCENTAGEM_IPI = (TOTAL_IPI/sum(TOTAL_IPI))*100) %>%
   arrange(desc(PORCENTAGEM_IPI)) %>%
   filter(PORCENTAGEM_IPI >= 1.39) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = PORCENTAGEM_IPI)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -PORCENTAGEM_IPI, sum), y = PORCENTAGEM_IPI))+
+  geom_col() +
   labs(title = "10 municípios que recebem a maior porcentagem de IPI") +
   xlab("Município") + ylab("Porcentagem IPI")
 ```
@@ -110,13 +115,26 @@ ID %>%
   mutate(PORCENTAGEM_IPVA = (TOTAL_IPVA/sum(TOTAL_IPVA)*100)) %>%
   arrange(desc(PORCENTAGEM_IPVA)) %>%
   filter(PORCENTAGEM_IPVA >= 1.25) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = PORCENTAGEM_IPVA)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -PORCENTAGEM_IPVA, sum), y = PORCENTAGEM_IPVA))+
+  geom_col() +
   labs(title = "10 municípios que recebem a maior porcentagem de IPVA") +
   xlab("Município") + ylab("Porcentagem IPVA")   
 ```
 
+### Análise gráficos 2 e 3
+
+A concentração exposta na análise anterior, por sua vez, também é observada para os repasses de IPI e IPVA, respectivamente nos **gráficos 2 e 3**. Todavia, no que tange ao **gráfico 2**, pode-se observar, também, uma semelhança em relação às porcentagens obtidas para tais repasses. De forma diferente disso, o **gráfico 3**, que retrata a questão do IPVA, mesmo que também possua uma prevalência dos municípios citados, pode-se observar uma **disparidade** das porcentagens obtidas, com uma concentração ainda maior. O município de Belo Horizonte, sozinho, possui a contabilização de aproximadamente **30%** do total dos repasses. 
+
 4. Quais são os valores absolutos referentes aos 10 maiores repasses de **ICMS** e quais são elas?
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+ID %>%
+  group_by(NOME_MUNICIPIO) %>%
+  summarize(TOTAL_ICMS = sum(VR_ICMS)) %>%
+  mutate(ICMS_MILHOES = TOTAL_ICMS/1000000) %>%
+  arrange(desc(ICMS_MILHOES)) %>%
+  filter(ICMS_MILHOES >= 144)
+```
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 ID %>%
@@ -125,8 +143,8 @@ ID %>%
   mutate(ABSOLUTO_ICMS = TOTAL_ICMS/1000000) %>%
   arrange(desc(ABSOLUTO_ICMS)) %>%
   filter(ABSOLUTO_ICMS >= 144) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = ABSOLUTO_ICMS)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -ABSOLUTO_ICMS, sum), y = ABSOLUTO_ICMS))+
+  geom_col() +
   labs(title = "10 municípios que recebem os maiores valores absolutos de ICMS") +
   xlab("Município") + ylab("ICMS (Milhões)")
 ```
@@ -137,16 +155,42 @@ ID %>%
 ID %>%
   group_by(NOME_MUNICIPIO) %>%
   summarize(TOTAL_IPI = sum(VR_IPI)) %>%
+  mutate(IPI_MILHOES = TOTAL_IPI/1000000) %>%
+  arrange(desc(IPI_MILHOES)) %>%
+  filter(IPI_MILHOES >= 1.78)
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+ID %>%
+  group_by(NOME_MUNICIPIO) %>%
+  summarize(TOTAL_IPI = sum(VR_IPI)) %>%
   mutate(ABSOLUTO_IPI = TOTAL_IPI/1000000) %>%
   arrange(desc(ABSOLUTO_IPI)) %>%
   filter(ABSOLUTO_IPI >= 1.78) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = ABSOLUTO_IPI)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -ABSOLUTO_IPI, sum), y = ABSOLUTO_IPI))+
+  geom_col() +
   labs(title = "10 municípios que recebem os maiores valores absolutos de IPI") +
   xlab("Município") + ylab("IPI (Milhões)")
 ```
 
+### Análise gráficos 4 e 5
+
+Já no que tange aos **valores absolutos referentes aos 10 maiores repasses**, tanto do ICMS quanto do IPI, com retratado nos **gráficos 4 e 5**, observa-se também uma concentração em municípios que se encontram na **região metropolitana de Belo Horizonte** ou, ainda, são considerados **polos comerciais ou cidades com um volume populacional elevado.**
+
+Em relação ao **IPI e ICMS**, tal concentração pode ser explicada pelo critério de repasse especificado pela Secretaria de Estado de Fazenda de Minas Gerais, segundo o **artigo 3º da Lei Complementar nº 63/1990** e **Lei Estadual nº 13.803/2000.** Nele, tem-se exposto que o valor a ser creditado para cada município deve ser proporcional a seu respectivo **índice de participação** que é apurado pelo Estado e obtido pelo **somatório dos índices do VAF** com os demais índices.
+
+Já no caso do **IPVA**, segundo a SEF/MG, em Minas Gerais, 50 % do valor arrecadado com o IPVA são creditados pelos bancos arrecadadores em conta do Estado e 50% são creditados em conta do município de licenciamento do veículo. Logo, municípios que possuem uma maior taxa de licenciamento do veículo, como Belo Horizonte, recebem um repasse maior.
+
 6. Quais são os valores absolutos referentes aos 10 maiores repasses de **IPVA** e quais são elas?
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+ID %>%
+  group_by(NOME_MUNICIPIO) %>%
+  summarize(TOTAL_IPVA = sum(VR_IPVA)) %>%
+  mutate(IPVA_MILHOES = TOTAL_IPVA/1000000) %>%
+  arrange(desc(IPVA_MILHOES)) %>%
+  filter(IPVA_MILHOES >= 30.0)
+```
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 ID %>%
@@ -155,8 +199,8 @@ ID %>%
   mutate(ABSOLUTO_IPVA = TOTAL_IPVA/1000000) %>%
   arrange(desc(ABSOLUTO_IPVA)) %>%
   filter(ABSOLUTO_IPVA >= 30.0) %>%
-  ggplot()+
-  geom_col(aes(x = NOME_MUNICIPIO, y = ABSOLUTO_IPVA)) +
+  ggplot(aes(x = reorder(NOME_MUNICIPIO, -ABSOLUTO_IPVA, sum), y = ABSOLUTO_IPVA))+
+  geom_col() +
   labs(title = "10 municípios que recebem os maiores valores absolutos de IPVA") +
   xlab("Município") + ylab("IPVA (Milhões)")
 ```
@@ -187,7 +231,7 @@ ID_MAIOR <- ID %>%
   filter(REPASSE_TOTAL <= 1.470765) %>%
   ggplot() +
   geom_col(aes(x = NOME_MUNICIPIO, y = REPASSE_TOTAL)) + 
-  labs(title = "5 municípios que rebebem o maior valor de repasse total dos impostos (em milhões)") + xlab("Município") + ylab("Repasse total dos impostos")
+  labs(title = "5 municípios que recebem o maior valor de repasse total dos impostos (em milhões)") + xlab("Município") + ylab("Repasse total dos impostos")
 ```
 
 9. Quanto foi o repasse total de ICMS em cada **mês de 2016**?
@@ -259,3 +303,7 @@ bind_rows(ID_ICMS, ID_IPI, ID_IPVA) %>%
   xlab("Mês") + ylab("Valor de repasse")
 
 ```
+
+## Limitações e dificuldades operacionais
+
+Devido à modificação do Portal do Dados Abertos de Minas Gerais simultaneamente à elaboração dessa Análise Exploratória, observou-se como dificuldades operacionais o acompanhamento das mudanças de bases realizadas pelo portal. Nesse sentido, no início da análise, as bases foram retiradas e importadas corretamente do link antigo referente à seção de Dados Abertos do Portal da Transparência, que foi sucedida por outra, intitulada Novo Portal de Dados Abertos. Entretanto, este, ainda em fase de construção, ainda não possui, igualmente, todos os conjuntos e organizações antes pertencentes ao primeiro portal. Dessa forma, necessitou-se realizar alterações no Relatório inicial da Pesquisa Exploratória.

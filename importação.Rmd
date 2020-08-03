@@ -221,7 +221,7 @@ ID_MAIOR <- ID %>%
   filter(REPASSE_TOTAL >= 266.973532) %>%
   ggplot() +
   geom_col(aes(x = NOME_MUNICIPIO, y = REPASSE_TOTAL)) + 
-  labs(title = "5 municípios que rebebem o maior valor de repasse total dos impostos (em milhões)") + xlab("Município") + ylab("Repasse total dos impostos")
+  labs(title = "5 municípios que rebebem o maior valor de repasse total dos impostos") + xlab("Município") + ylab("Repasse total dos impostos (Milhões)")
 
 
 ```
@@ -239,11 +239,11 @@ Não é por acaso que os cinco municípios que aparecem no gráfico são, també
   filter(REPASSE_TOTAL <= 1.470765) %>%
   ggplot() +
   geom_col(aes(x = NOME_MUNICIPIO, y = REPASSE_TOTAL)) + 
-  labs(title = "5 municípios que recebem o maior valor de repasse total dos impostos (em milhões)") + xlab("Município") + ylab("Repasse total dos impostos")
+  labs(title = "5 municípios que recebem o maior valor de repasse total dos impostos") + xlab("Município") + ylab("Repasse total dos impostos (Milhões)")
 ```
 ### Análise gráfico 8
 
-Os municípios que recebem o **menor** repasse total dos impostos **ICMS**, **IPI** e **IPVA** são, respectivamente: Glaucilandia, Paiva, Senador Jose      Bento, Nacip Raydan e Rochedo de Minas. 
+Os municípios que recebem o **menor** repasse total dos impostos **ICMS**, **IPI** e **IPVA** são, respectivamente: Glaucilandia, Paiva, Senador Jose      Bento, Nacip Raydan e Rochedo de Minas. Todos os municípios apresentados no gráfico são pouco populosos, sendo que o mais populoso contava com 3.154 habitantes, de acordo com o censo de 2010. 
 
 
 9. Quanto foi o repasse total de ICMS em cada **mês de 2016**?
@@ -261,8 +261,8 @@ ID2 %>% select(NOME_MES, VR_ICMS) %>%
   arrange(NOME_MES) %>%
   ggplot()+
   geom_col(aes(x = NOME_MES, y = ICMS_MES)) +
-  labs(title = "Repasse ICMS em cada mês (em milhões)") +
-  xlab("Mês") + ylab("Repasse ICMS")
+  labs(title = "Repasse ICMS em cada mês") +
+  xlab("Mês") + ylab("Repasse ICMS (Milhões)")
   
 ```
 
@@ -276,8 +276,8 @@ ID2 %>% select(NOME_MES, VR_IPI) %>%
   arrange(NOME_MES) %>%
   ggplot()+
   geom_col(aes(x = NOME_MES, y = IPI_MES)) +
-  labs(title = "Repasse IPI em cada mês (em milhões)") +
-  xlab("Mês") + ylab("Repasse IPI")
+  labs(title = "Repasse IPI em cada mês") +
+  xlab("Mês") + ylab("Repasse IPI (Milhões)")
 
 ```
 
@@ -292,9 +292,21 @@ ID2 %>% select(NOME_MES, VR_IPVA) %>%
   arrange(NOME_MES) %>%
   ggplot()+
   geom_col(aes(x = NOME_MES, y = IPVA_MES)) +
-  labs(title = "Repasse IPVA em cada mês (em milhões)") +
-  xlab("Mês") + ylab("Repasse IPVA")
+  labs(title = "Repasse IPVA em cada mês") +
+  xlab("Mês") + ylab("Repasse IPVA (Milhões)")
 ```
+
+### Análise gráficos 9, 10 e 11
+
+Os gráficos que apresentam o valor repassado aos municípios mineiros de acordo com o mês indica que o comportamento dos tres impostos analisados são bem diversos. 
+
+O **ICMS** não apresenta diferenças muito grandes de repasses de acordo com cada mês de 2016. Sendo que **dezembro** é o mês que gerou o maior repasse e **fevereiro** o menor. Para criar hipotéses acerca do motivo desse comportamento nesses dois meses seria necessário um estudo mais aprofundado, com outras bases de dados que viabilizassem dados mais detalhados acerca da arrecadação do imposto de acordo com o mês. Entretanto, mesmo com dados poucos detalhados, é possível discutir e criar a hipotése genérica de que o mês de dezembro é o que apresenta o maior repasso devido a época natalina e a existencia do décimo terceiro salário. Essa hipotése se apoia no fato de que no mês de dezembro as pessoas estariam mais aptas a comprar e pagar por serviços do que nos outros meses. 
+
+Enquanto isso, o **gráfico 10** se relaciona com o **IPI** e apresenta uma diferença mais acentuada entre os repasses aos municípios de acordo com o mês de 2016, sendo essa diferença mais significativa no que tange valores relativos e não valores absolutos. Nota-se que **janeiro** é o mês no qual foi registrado o maior repasse de **IPI** aos municípios e **junho** o menor.
+
+O **gráfico 11** se refere aos repasses provenientes do **IPVA**, ele demonstra um comportamento muito distindo de acordo com cada mês, sendo que em **janeiro** o repasse é significativamente maior que nos outros meses. Isso ocorro devido os critérios de arrecadação desse imposto, que faz com que ocorra uma concentração no mês de janeiro. 
+
+Por fim, o gráfico abaixo ilustra o repasse total dos tres impostos de acordo com o mês em 2016, com o recorte que possibilita identificar a parcela que é proveniente de cada um dos impostos analisados. 
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 
@@ -310,10 +322,14 @@ bind_rows(ID_ICMS, ID_IPI, ID_IPVA) %>%
   arrange(NOME_MES) %>%
   ggplot()+
   geom_col(aes(x = NOME_MES, y = VALOR_IMPOSTO, color = IMPOSTO)) +
-  labs(title = "Repasse dos impostos em cada mês (em milhões)") +
-  xlab("Mês") + ylab("Valor de repasse")
+  labs(title = "Repasse dos impostos em cada mês") +
+  xlab("Mês") + ylab("Valor de repasse (Milhões)")
 
 ```
+
+Nesse gráfico nota-se que **janeiro** é o mês que registrou-se o **maior** repasse no ano de 2016, sendo que esse respasse é devido, principalmente, aos repasses provenientes do **IPVA**, pois, apesar de em valores absolutos ser proximo ao *ICMS*, O **IPVA** está concentrado nesse mês em relação aos outros. Além disso, ressalta-se que o **IPI** é o imposto responsável por menor parte dos repasses em todos os meses. 
+
+Observa-se, também, que o **ICMS** é o imposto, dentre os analisados, que mais gera repasses aos municípios mineiros, seguido pelo **IPVA** e, em seguida, pelo **IPI**. 
 
 ## Limitações e dificuldades operacionais
 

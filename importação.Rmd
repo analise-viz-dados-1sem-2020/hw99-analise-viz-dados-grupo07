@@ -172,15 +172,6 @@ ID %>%
   labs(title = "10 municípios que recebem os maiores valores absolutos de IPI") +
   xlab("Município") + ylab("IPI (Milhões)")
 ```
-
-### Análise gráficos 4 e 5
-
-Já no que tange aos **valores absolutos referentes aos 10 maiores repasses**, tanto do ICMS quanto do IPI, com retratado nos **gráficos 4 e 5**, observa-se também uma concentração em municípios que se encontram na **região metropolitana de Belo Horizonte** ou, ainda, são considerados **polos comerciais ou cidades com um volume populacional elevado.**
-
-Em relação ao **IPI e ICMS**, tal concentração pode ser explicada pelo critério de repasse especificado pela Secretaria de Estado de Fazenda de Minas Gerais, segundo o **artigo 3º da Lei Complementar nº 63/1990** e **Lei Estadual nº 13.803/2000.** Nele, tem-se exposto que o valor a ser creditado para cada município deve ser proporcional a seu respectivo **índice de participação** que é apurado pelo Estado e obtido pelo **somatório dos índices do VAF** com os demais índices.
-
-Já no caso do **IPVA**, segundo a SEF/MG, em Minas Gerais, 50 % do valor arrecadado com o IPVA são creditados pelos bancos arrecadadores em conta do Estado e 50% são creditados em conta do município de licenciamento do veículo. Logo, municípios que possuem uma maior taxa de licenciamento do veículo, como Belo Horizonte, recebem um repasse maior.
-
 6. Quais são os valores absolutos referentes aos 10 maiores repasses de **IPVA** e quais são elas?
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
@@ -205,6 +196,18 @@ ID %>%
   xlab("Município") + ylab("IPVA (Milhões)")
 ```
 
+### Análise gráficos 4, 5 e 6
+
+Já no que tange aos **valores absolutos referentes aos 10 maiores repasses**, tanto do ICMS quanto do IPI e do IPVA, com retratado nos **gráficos 4, 5 e 6**, observa-se também uma concentração em municípios que se encontram na **região metropolitana de Belo Horizonte** ou, ainda, são considerados **polos comerciais ou cidades com um volume populacional elevado.**
+
+Em relação ao **IPI e ICMS**, tal concentração pode ser explicada pelo critério de repasse especificado pela Secretaria de Estado de Fazenda de Minas Gerais, segundo o **artigo 3º da Lei Complementar nº 63/1990** e **Lei Estadual nº 13.803/2000.** Nele, tem-se exposto que o valor a ser creditado para cada município deve ser proporcional a seu respectivo **índice de participação** que é apurado pelo Estado e obtido pelo **somatório dos índices do VAF** com os demais índices.
+
+Já no caso do **IPVA**, segundo a SEF/MG, em Minas Gerais, 50 % do valor arrecadado com o IPVA são creditados pelos bancos arrecadadores em conta do Estado e 50% são creditados em conta do município de licenciamento do veículo. Logo, municípios que possuem uma maior taxa de licenciamento do veículo, como Belo Horizonte, recebem um repasse maior. 
+
+Dessa forma, é perceptível que os **gráficos 4 e 5** são muito semelhantes, sendo que o marco de diferença entre eles são os valores do eixo y (a escala). Enquanto isso, o **gráfico 6**, apesar de também demonstrar uma concentração nos municípios da **região metrobolitana de Belo Horizonte**, não é tão semelhante aos dois anteriores. Isso acontece devido a semelhança entre os críterios de repasse do **ICMS** e do *IPI*, que é distivinto do correspondendo ao repasse do **IPVA**. 
+
+No que tange os valores absolutos, conclui-se que o **ICSM** apresenta os valores mais altos, seguido do **IPVA** e, por fim, do **IPI**. 
+
 7. Quais são os 5 municípios que recebem o **maior** repasse total (ICMS+IPI+IPVA)?
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
@@ -222,6 +225,11 @@ ID_MAIOR <- ID %>%
 
 
 ```
+### Análise gráfico 7
+
+Os cinco municípios que mais recebem verba por meio do repasse total do **ICMS**, **IPI** e **IPVA** são, respectivimante: Belo Horizonte, Betim, Uberlândia, Contagem e Juiz de Fora. Essa é exatamente a ordem dos municípios que recebem maior repasse de **ICMS**, que por ser o imposto que gera mais repasse em valores absolutos é o que mais influencia no resultado do **gráfico 7**.  
+
+Não é por acaso que os cinco municípios que aparecem no gráfico são, também, os municípios mais populosos de MG, pois o índice populacional influencia de forma mais direta os critérios de repasse do **ICMS** e do **IPI**. Essa influência já não é tão clara no que tange o repasse do **IPVA**, como se observa no **gráfico 6**.
 
 8. Quais são os 5 municípios que recebem o **menor** repasse total (ICMS+IPI+IPVA)?
 
@@ -233,6 +241,10 @@ ID_MAIOR <- ID %>%
   geom_col(aes(x = NOME_MUNICIPIO, y = REPASSE_TOTAL)) + 
   labs(title = "5 municípios que recebem o maior valor de repasse total dos impostos (em milhões)") + xlab("Município") + ylab("Repasse total dos impostos")
 ```
+### Análise gráfico 8
+
+Os municípios que recebem o **menor** repasse total dos impostos **ICMS**, **IPI** e **IPVA** são, respectivamente: Glaucilandia, Paiva, Senador Jose      Bento, Nacip Raydan e Rochedo de Minas. 
+
 
 9. Quanto foi o repasse total de ICMS em cada **mês de 2016**?
 
@@ -253,7 +265,6 @@ ID2 %>% select(NOME_MES, VR_ICMS) %>%
   xlab("Mês") + ylab("Repasse ICMS")
   
 ```
-
 
 10. Quanto foi o repasse total de IPI em cada **mês de 2016**?
 
